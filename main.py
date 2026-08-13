@@ -42,6 +42,9 @@ def adjust_grid(positions):
     # a snapshot of all the initial positions is taken and then the logic is applied
     # After logic is applied, a new set of positions is created which is then drawn
     new_positions=set()
+
+
+    #also add game engine here
     for position in positions:
         # get all the neighbors of a position
         neighbours =get_neighbors(position)
