@@ -36,36 +36,36 @@ def draw_grid(positions):
     for col in range(1,GRID_WIDTH):
         pygame.draw.line(screen,BLACK,(col*TILE_SIZE,0),(col*TILE_SIZE,HEIGHT)) #vertical lines
 
-# this function is no more required as the adjust grid logic is moved to advanced physics function in game_engine.py
-def adjust_grid(positions):
-    # main logic that adjusts the grid
-    # logic for which cell will remain alive and which cell will die
-    all_neighbours=set()
-    # a snapshot of all the initial positions is taken and then the logic is applied
-    # After logic is applied, a new set of positions is created which is then drawn
-    new_positions=set()
+# deprecated: this function is no more required as the adjust grid logic is moved to advanced physics function in game_engine.py
+# def adjust_grid(positions):
+#     # main logic that adjusts the grid
+#     # logic for which cell will remain alive and which cell will die
+#     all_neighbours=set()
+#     # a snapshot of all the initial positions is taken and then the logic is applied
+#     # After logic is applied, a new set of positions is created which is then drawn
+#     new_positions=set()
 
 
-    #also add game engine here
-    for position in positions:
-        # get all the neighbors of a position
-        neighbours =get_neighbors(position)
-        # dumps all the neighbour position in all_neighbours
-        all_neighbours.update(neighbours)
-        # check which neighbours are alive and which are not and adds the alive neighbours to new_position
-        neighbours = list(filter(lambda x: x in positions, neighbours))
-        if len(neighbours) in [2,3]:
-            new_positions.add(position)
-    for position in all_neighbours:
-        # we go through all_neighbours which are a neighbour to some alive cells.
-        # we then check the neighbour's neighbours and dump them in the variable "neighbhours"
-        neighbours = get_neighbors(position)
-        # then we filter the neighbours and find which ones are alive
-        neighbours = list(filter(lambda x: x in positions, neighbours))
-        # if there are exactly three alive neighbours then congrats, a new cell is born
-        if len(neighbours) == 3:
-            new_positions.add(position)
-    return new_positions
+#     #also add game engine here
+#     for position in positions:
+#         # get all the neighbors of a position
+#         neighbours =get_neighbors(position)
+#         # dumps all the neighbour position in all_neighbours
+#         all_neighbours.update(neighbours)
+#         # check which neighbours are alive and which are not and adds the alive neighbours to new_position
+#         neighbours = list(filter(lambda x: x in positions, neighbours))
+#         if len(neighbours) in [2,3]:
+#             new_positions.add(position)
+#     for position in all_neighbours:
+#         # we go through all_neighbours which are a neighbour to some alive cells.
+#         # we then check the neighbour's neighbours and dump them in the variable "neighbhours"
+#         neighbours = get_neighbors(position)
+#         # then we filter the neighbours and find which ones are alive
+#         neighbours = list(filter(lambda x: x in positions, neighbours))
+#         # if there are exactly three alive neighbours then congrats, a new cell is born
+#         if len(neighbours) == 3:
+#             new_positions.add(position)
+#     return new_positions
 
 def get_neighbors(pos):
     x,y=pos
@@ -83,14 +83,30 @@ def get_neighbors(pos):
             neighbours.append((x+dx,y+dy))
     return neighbours
 
+def get_user_config():
+    print("==============================")
+    print("=    CONWAY'S GAME OF LIFE   =")
+    print("==============================")
+    print("\nLeave blank and press enter for default settings (B3/S23)\n")
+    # birth_rules
+    b= input("Enter Birth Rules (e.g. 3 for B3): ") or "3" #default input is set to 3
+    birth_rules=set(int(x) for x in b if x.isdigit()) # generator expression that checks if the input string is digit or not
+    # if it is, then add it to the set
+    # survival rules
+    s = input("Enter Survival Rules (e.g 23 for S23): ") or"23"
+    survival_rules = set(int(x) for x in s if x.isdigit())
+    # toggle budget
+    tb = input("Enter AI's budget (e.g. 7): ") or "7"
+    budget = int(tb)
+    print("\nStarting simulation...")
+    return birth_rules,survival_rules,budget
 def main():
     running=True
     playing =False
     ai_enabled=True
-    BIRTH_RULES={3}
-    SURVIVAL_RULES={2,3}
+    BIRTH_RULES, SURVIVAL_RULES,TOGGLE_BUDGET = get_user_config()
 
-    agent = ge.UniversalMicroAgent(toggle_budget=7)
+    agent = ge.UniversalMicroAgent(toggle_budget=TOGGLE_BUDGET)
     count=0
     update_freq=10
     
@@ -113,7 +129,8 @@ def main():
         
         #stopping the game using pygame.event.get()
         #what does pygame.event.get() do? 
-        #
+        # it gets all the events that have happened in the game, like pressing a key or mouse click
+        # it gets them out in a queue and drains the queue empty
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
