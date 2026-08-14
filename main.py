@@ -1,5 +1,6 @@
 import pygame
 import random
+import game_engine as ge
 
 pygame.init()
 
@@ -35,6 +36,7 @@ def draw_grid(positions):
     for col in range(1,GRID_WIDTH):
         pygame.draw.line(screen,BLACK,(col*TILE_SIZE,0),(col*TILE_SIZE,HEIGHT)) #vertical lines
 
+# this function is no more required as the adjust grid logic is moved to advanced physics function in game_engine.py
 def adjust_grid(positions):
     # main logic that adjusts the grid
     # logic for which cell will remain alive and which cell will die
@@ -61,21 +63,22 @@ def adjust_grid(positions):
         # then we filter the neighbours and find which ones are alive
         neighbours = list(filter(lambda x: x in positions, neighbours))
         # if there are exactly three alive neighbours then congrats, a new cell is born
-        if len(neighbours) in [3,6]:
+        if len(neighbours) == 3:
             new_positions.add(position)
     return new_positions
 
 def get_neighbors(pos):
     x,y=pos
     neighbours=[]
+    # logic: get all the neighbours of alive cells, cause only they need to stay alive or dead
     for dx in [-1,0,1]:
         if x+dx<0 or x+dx>=GRID_WIDTH:
-            continue
+            continue # boundary conditions: no need to evaluate for those squares which are not in my domain
         for dy in [-1,0,1]:
             if dx ==0 and dy==0:
-                continue
+                continue 
             if y+dy<0 or y+dy>=GRID_HEIGHT:
-                continue
+                continue # boundary conditions
             
             neighbours.append((x+dx,y+dy))
     return neighbours
@@ -83,6 +86,11 @@ def get_neighbors(pos):
 def main():
     running=True
     playing =False
+    ai_enabled=True
+    BIRTH_RULES={3}
+    SURVIVAL_RULES={2,3}
+
+    agent = ge.UniversalMicroAgent(toggle_budget=7)
     count=0
     update_freq=10
     
@@ -93,11 +101,14 @@ def main():
         #regulates the speed of the while loop. Only runs 60 times per second
         if playing:
             count+=1
-        if count>=update_freq:
-            count=0
-            positions=adjust_grid(positions)
+            if count>=update_freq:
+                count=0
+                positions=ge.step_simulation(positions=positions,birth_rules=BIRTH_RULES,survival_rules=SURVIVAL_RULES,gridh=GRID_HEIGHT,gridw=GRID_WIDTH,agent=agent if ai_enabled else None)
 
-        pygame.display.set_caption("Playing" if playing else "Paused")
+        ai_status="ON" if ai_enabled else "OFF"
+        play_status="Playing" if playing else "Paused"
+
+        pygame.display.set_caption(f"Status: {play_status} | AI intervention: {ai_status}")
 
         
         #stopping the game using pygame.event.get()
@@ -118,11 +129,17 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     playing = not playing
+                if event.key == pygame.K_a:
+                    ai_enabled = not ai_enabled
                 if event.key == pygame.K_c:
                     positions=set()
                     playing = False
                 if event.key==pygame.K_g:
                     positions=gen(random.randrange(8,12)*GRID_WIDTH)
+                if event.key == pygame.K_UP:
+                    update_freq=max(1,update_freq-1)
+                if event.key == pygame.K_DOWN:
+                    update_freq+=1
 
         screen.fill(GREY)
         draw_grid(positions=positions)
