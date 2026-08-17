@@ -14,10 +14,13 @@ A Python and Pygame implementation of Conway's Game of Life, featuring an AI age
    git clone [https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git](https://github.com/kaushikcodes-112/Conways_game_of_life_w-AI.git)
    cd Conways_game_of_life_w-AI
 
-2. Install the required dependencies (Pygame):
-  pip install pygame
+2. Install the required dependencies (Pygame): 
+   ```bash
+   pip install pygame
+(Note: This works for python 3.13, but not for 3.14 because for some reason python 3.14 does not support pygame)
 
 4. Run the application:
+   ```bash
    python main.py
 
 Configuration Menu
@@ -31,11 +34,12 @@ AI Toggle Budget: The maximum number of micro-interventions (cell flips) the AI 
 
 Controls:
 The simulation can be fully manipulated at runtime using your keyboard and mouse.
-Input                        Action
-Mouse Left Click        Manually draw or erase cells on the grid
-SPACE                   Play / Pause the simulation 
-A                       Toggle the AI Agent ON or OFF
-G                       Generate a random cluster of cells
-C                       Clear the entire grid
-UP Arrow                Increase simulation speed
-DOWN Arrow              Decrease simulation speed
+|Input             |           Action|
+| :--------------- | ---------------:|
+|Mouse Left Click  |      Manually draw or erase cells on the grid|
+|SPACE             |      Play / Pause the simulation| 
+|A                 |      Toggle the AI Agent ON or OFF|
+|G                 |      Generate a random cluster of cells|
+|C                 |      Clear the entire grid|
+|UP Arrow          |      Increase simulation speed|
+|DOWN Arrow        |      Decrease simulation speed|
